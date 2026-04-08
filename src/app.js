@@ -50,6 +50,15 @@ app.get("/", publicApiRateLimiter, (_req, res) => {
   res.status(200).json({ message: "Expense Tracker API running" });
 });
 
+app.get("/api/ping", publicApiRateLimiter, (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    message: "pong",
+    service: "expense-tracker-backend",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/api", publicApiRateLimiter, dbCheckRoute);
 app.use("/api", publicApiRateLimiter, mailTestRoute);
 app.use("/api/auth", authRateLimiter, authRoutes);
