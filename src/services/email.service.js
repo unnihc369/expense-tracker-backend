@@ -19,6 +19,11 @@ function normalizeGmailAppPassword(pass) {
   return p.replace(/\s+/g, "");
 }
 
+function getClientOrigin() {
+  const origin = trimEnv(process.env.CLIENT_URL);
+  return origin ? origin.replace(/\/$/, "") : "";
+}
+
 /**
  * Sends email verification link with raw token (only the hash is stored in DB).
  * Does not throw: returns { sent, reason? } so registration can still succeed.
@@ -43,8 +48,11 @@ export async function sendVerificationEmail(email, rawVerificationToken) {
       },
     });
 
-    const origin = getBackendPublicOrigin();
-    const url = `${origin}/api/auth/verify/${rawVerificationToken}`;
+    const clientOrigin = getClientOrigin();
+    const backendOrigin = getBackendPublicOrigin();
+    const url = clientOrigin
+      ? `${clientOrigin}/verify/${rawVerificationToken}`
+      : `${backendOrigin}/api/auth/verify/${rawVerificationToken}`;
 
     await transporter.sendMail({
       to: email,
